@@ -9,9 +9,31 @@ intents:
   - mood_unhappy
   - bot_challenge
 
+slots:
+  answer1:
+    type: categorical
+    mappings:
+    - type: custom
+
+forms:
+  qna_form:
+    ignored_intents: 
+    - affirm
+    - deny
+    - mood_great
+    - mood_unhappy
+    - bot_challenge
+    required_slots:
+        - answer1
+
 actions:
   - action_greet
+  - validate_answer1
+
 responses:
+  
+  utter_ask_answer1:
+  - text: pls answer the question for topic1 
   utter_greet_action:
   - text: "Would you like to talk and learn alongside"
 

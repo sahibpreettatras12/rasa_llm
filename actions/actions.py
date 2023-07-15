@@ -25,16 +25,12 @@ from langchain.memory import ConversationBufferMemory
 from langchain.llms import OpenAI
 from rasa_sdk.events import FollowupAction
 import time
+from rasa_sdk.forms import FormValidationAction
 from datetime import date
 
-month= date.today().month
-year=date.today().year
 
 dic_month={1:'January',2:'Feburary',3:'March',4:'April',5:'May',6:'June',7:'July',8:'August'
 ,9:'September',10:'October',11:'November',12:'December'}
-
-month=dic_month[month]
-present_date = str(month)+' '+str(year)
 
 _ = load_dotenv(find_dotenv())
 
@@ -77,7 +73,8 @@ result = get_completion(prompt=result,temperature=0.0)
 if (result[0]=='[') and (result[-1]==']'):
     result = ast.literal_eval(result)
 
-result = random.sample(result,5)
+result = ['rasa']
+result = random.sample(result,1)
 
 propmt2 = f"""Given you are Artificial intelligent system now recommend 2 tough multiple
 choice interview questions for each
@@ -104,7 +101,8 @@ class ActionGreet(Action):
 
         dispatcher.utter_message(text="Hi This is a hirebot happy to help")
         dispatcher.utter_message(response='utter_greet_action')
-        
+        slot_a1 = tracker.get_slot('answer1')
+        print(slot_a1)
         # print(result)
         for i,j in result.items():
             temp = 0
@@ -122,3 +120,26 @@ class ActionGreet(Action):
 
         return []
 
+class ValidateAnswer1(FormValidationAction):
+    def name(self) -> Text:
+        return "validate_answer1"
+
+    async def extract_answer1(
+        self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
+    ) -> Dict[Text, Any]:
+        text_of_last_user_message = tracker.latest_message.get("text")
+        
+        sit_outside = "answer1" in text_of_last_user_message
+        if sit_outside:
+            return [SlotSet("answer1", text_of_last_user_message)]
+
+        else:
+            return [SlotSet("answer1", 'rasa answer by sahib')]
+        
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        # Set the value of a slot
+        slot_value = "sahib and rasa answer"
+        return [SlotSet("answer1", slot_value)]
