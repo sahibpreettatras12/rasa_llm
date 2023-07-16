@@ -1,7 +1,7 @@
 version: "3.1"
 
 intents:
-  - greet
+  - result_check
   - goodbye
   - affirm
   - deny
@@ -9,10 +9,34 @@ intents:
   - mood_unhappy
   - bot_challenge
 
+forms:
+  qna_form:
+    required_slots:
+      - answer_1
+slots:
+  answer_1:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_text
+        conditions:
+         - active_loop: qna_form
+           requested_slot: answer_1
 actions:
-  - action_greet
+  - action_result_check
+  - action_ask_answer_1
+  - action_validate_answer_1
 responses:
-  utter_greet_action:
+
+  # utter_ask_answer_1: # we can also create action_ask_<slot_name> or utter_ask_<slot_name>
+  # - text: We are good to let's jump right in
+
+  utter_submit:
+  - text: Ok thanks for submission
+  - text: We got your response
+  - text: Saved in our Database don't worry
+
+  utter_result_check:
   - text: "Would you like to talk and learn alongside"
 
   utter_cheer_up:

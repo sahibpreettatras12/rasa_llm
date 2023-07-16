@@ -4,15 +4,15 @@ stories:
 
 - story: happy path
   steps:
-  - intent: greet
-  - action: action_greet
+  - intent: result_check
+  - action: action_result_check
   - intent: mood_great
   - action: utter_happy
 
 - story: sad path 1
   steps:
-  - intent: greet
-  - action: action_greet
+  - intent: result_check
+  - action: action_result_check
   - intent: mood_unhappy
   - action: utter_cheer_up
   - action: utter_did_that_help
@@ -21,8 +21,8 @@ stories:
 
 - story: sad path 2
   steps:
-  - intent: greet
-  - action: action_greet
+  - intent: result_check
+  - action: action_result_check
   - intent: mood_unhappy
   - action: utter_cheer_up
   - action: utter_did_that_help

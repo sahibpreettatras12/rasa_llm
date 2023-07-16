@@ -8,6 +8,8 @@
 *.rasa
 *chroma
 /index/
+# Ignore files with the "chroma" prefix
+chroma*
 
 /sbert_model/*.bin
 # /api/requirements.txt

@@ -1,21 +1,26 @@
 version: "3.1"
 
 nlu:
-- intent: greet
+
+- intent: start_qna
   examples: |
-    - hey champ
-    - hello champ
-    - hi champ
-    - hello there champ
-    - good morning champ
-    - good evening champ
-    - moin champ
-    - hey there champ
-    - let's go champ
-    - hey dude champ
-    - goodmorning champ
-    - goodevening champ
-    - good afternoon champ
+    - ok we can start
+    - ok let's start
+    - yup
+    - i am good
+    - pls 
+    - proceed
+    - yup we are good to go
+- intent: result_check
+  examples: |
+    - show me my result
+    - whats my result
+    - results please
+    - can you tell me my marks
+    - what are my marks
+    - marks mine?
+    - what are my marks
+    
 
 - intent: goodbye
   examples: |

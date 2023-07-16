@@ -11,3 +11,27 @@ rules:
   steps:
   - intent: bot_challenge
   - action: utter_iamabot
+
+- rule: Activate form
+  steps:
+  - intent: start_qna
+  - action: qna_form
+  - active_loop: qna_form
+  
+- rule: Marks check
+  steps:
+    - intent: result_check
+    - action: action_result_check
+
+- rule: Submit form
+  condition:
+  - active_loop: qna_form
+  steps:
+  - action: qna_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: utter_submit
+  # - action: action_listen
+  - action: action_validate_answer_1
+  
