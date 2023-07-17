@@ -11,7 +11,7 @@ from typing import Any, Text, Dict, List
 from dotenv import load_dotenv,find_dotenv
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.events import UserUtteranceReverted, SlotSet,ActionExecuted
+from rasa_sdk.events import UserUtteranceReverted, SlotSet,ActionExecuted,AllSlotsReset
 import os,ast,random
 import openai
 import langchain
@@ -27,14 +27,8 @@ from rasa_sdk.events import FollowupAction
 import time
 from datetime import date
 
-month= date.today().month
-year=date.today().year
 
-dic_month={1:'January',2:'Feburary',3:'March',4:'April',5:'May',6:'June',7:'July',8:'August'
-,9:'September',10:'October',11:'November',12:'December'}
-
-month=dic_month[month]
-present_date = str(month)+' '+str(year)
+answer_iter=0
 
 _ = load_dotenv(find_dotenv())
 
@@ -79,46 +73,154 @@ if (result[0]=='[') and (result[-1]==']'):
 
 result = random.sample(result,5)
 
-propmt2 = f"""Given you are Artificial intelligent system now recommend 2 tough multiple
-choice interview questions for each
-element in {result} and each question can have only 2 responses and the response should only be in 
-yes/no or it can be true/false.
-Also store the links from which questions were made
-your response should be json
+propmt2 = f"""Given you are Artificial intelligent system now recommend 1 tough interview questions 
+for each element in {result} and return the output in the json format below
 
-topic1 : [list of questions for topic1,answers for questions for topic1,links for questions for topic1 ]
+topic1 : [list of questions for topic1]
+
 and so on
 
 """
+answer_list=[]
 result = get_completion(prompt=propmt2,temperature=0.0)
 result = ast.literal_eval(result)
+print("result type is  -->",type(result))
 
-class ActionGreet(Action):
+class ActionResultCheck(Action):
 
     def name(self) -> Text:
-        return "action_greet"
+        return "action_result_check"
 
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        global answer_iter
 
-        dispatcher.utter_message(text="Hi This is a hirebot happy to help")
-        dispatcher.utter_message(response='utter_greet_action')
-        
+        if answer_iter >= 4:
+            print(answer_list)
+            dispatcher.utter_message(text='You have got good marks')
+            return []
+        elif answer_iter ==0:
+            dispatcher.utter_message(text="Hi This is a hirebot happy to help")
+            # dispatcher.utter_message(response='utter_result_check')
+            
+            p = tracker.get_slot('answer_1')
+            print('we got ',p)
+            print('Till now we have',answer_list)
+            return []
+
+        else:
+            dispatcher.utter_message(text='Please complete the assignment')
+            return []
         # print(result)
-        for i,j in result.items():
-            temp = 0
-            for question in j:
-                    if temp==0:
-                        dispatcher.utter_message(text=f"""For **{i}** you have """)
-                        dispatcher.utter_message(text=f"""1.  **{question}** """)
+        # for i,j in result.items():
+        #     temp = 0
+        #     for question in j:
+        #             if temp==0:
+        #                 dispatcher.utter_message(text=f"""For **{i}** you have """)
+        #                 dispatcher.utter_message(text=f"""1.  **{question}** """)
                         
-                    else:
-                        dispatcher.utter_message(text=f"""1.  **{question}** """)
+        #             else:
+        #                 dispatcher.utter_message(text=f"""1.  **{question}** """)
 
                     
-                    #just to check which we are on
-                    temp+=1
+        #             #just to check which we are on
+        #             temp+=1
 
-        return []
+        
 
+class ActionAskAnswer1(Action):
+
+    def name(self) -> Text:
+        return "action_ask_answer_1"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        global answer_iter
+
+        if answer_iter==0:
+            dispatcher.utter_message(text=f"We are Good Let's get educated together")
+
+        # just fetching only first topic's questions because we want to
+        # show only first topic's questions to user 
+
+        print("Length of dictionary is ",len(result))
+
+        if answer_iter in [0,1,2,3,4]:
+            first_key = next(iter(result))
+            answer_iter+=1
+            first_value = result[first_key]
+
+            #removing key from dictionary (Questions we already asked)
+            del result[first_key]
+
+            new_result = {first_key:first_value} 
+            
+            for i,j in new_result.items():
+                temp = 0
+
+                # just want to show only one question per topic because 
+                # prompts can give us more than one questions per topic
+                print('J was -->',j)
+                
+                if len(j)>=1:
+                    j = j[:1]
+                    for question in j:
+                            # if temp==0:
+                            dispatcher.utter_message(text=f"""For **{i}** you have """)
+                            dispatcher.utter_message(text=f"""1.  **{question}** """)
+                                
+                            # else:
+                            #     dispatcher.utter_message(text=f"""1.  **{question}** """)
+                            
+                            # temp+=1
+                else:
+                    dispatcher.utter_message(text='Marks the end of assignment')
+            return []
+        else:
+            dispatcher.utter_message(text='Assignment is ended here how can i assist further')
+
+class ActionValidateAnswer1(Action):
+
+    def name(self) -> Text:
+        return "action_validate_answer_1"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # update the number of answers we have answered
+        print("Answer Iter  -->",answer_iter)
+        if answer_iter in [0,1,2,3,4]:
+            dispatcher.utter_message(text=f"We have saved your response for question {int(answer_iter)}")
+            # global answer_iter
+            # answer_iter+=1
+            
+            # dispatcher.utter_message(text=f"I have fetched your answer thanks")
+
+            p = tracker.get_slot('answer_1')
+            dispatcher.utter_message(text = f'we got **{p}** ')
+            answer_list.append(p)
+
+            return [AllSlotsReset()]
+        
+        else:
+            dispatcher.utter_message(text=f"""
+                                      You have submitted atleast 4 answers
+                                     \n so you can check scoes""")
+            return []
+
+    
+        # print('Answer 1 is  -->',tracker.get_slot('answer_1'))
+        # if tracker.get_slot('answer_1'):
+        #     dispatcher.utter_message(text=f"We have saved your response")
+        #     return []
+        # else:
+        #     dispatcher.utter_message(text=f"I have fetched your answer thankies")
+
+        #     p = tracker.get_slot('answer_1')
+        #     dispatcher.utter_message(text = f'we got **{p}** ')
+        #     answer_list.append(p)
+
+        #     return []
