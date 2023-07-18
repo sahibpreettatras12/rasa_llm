@@ -63,13 +63,53 @@ query1 = """list down all the technologies on which the person has worked in the
  in python list"""
 result = pdf_qa({"question": query1})
 result  = result['answer']
-result = f"""
-Given you are the samrt assistant now given {result} list down all the technologies on which a person has worked
-give out response in python list"""
+
+
+result = f""" given you are the samrt assistant now given {result} list down all the technologies on which 
+a person has worked give out response in python list
+element1 : a technology 
+so on
+Format the output as Python List 
+
+with different elements where each element is a technology 
+
+"""
+
+def find_list_indices(string):
+    list_indices = []
+    stack = []
+
+    for i, char in enumerate(string):
+        if char == '[':
+            stack.append(i)
+        elif char == ']':
+            if stack:
+                start_index = stack.pop()
+                list_indices.append((start_index, i))
+
+    return list_indices
+
+
 result = get_completion(prompt=result,temperature=0.0)
 
-if (result[0]=='[') and (result[-1]==']'):
-    result = ast.literal_eval(result)
+# print('Result 2 -->',result)
+
+indices = find_list_indices(result)
+print(indices)
+
+# just to be sure we are fetching list used --> find_list_indices function
+# then fetched whatever first list we found from result
+result = result[indices[0][0]:indices[0][1]+1]
+
+# if (result[0]=='[') and (result[-1]==']'):
+
+print('Before ast',result)
+result = ast.literal_eval(result)
+print('After ast',result)
+
+result = [element.lower() for element in result]
+print(result)
+
 
 result = random.sample(result,5)
 
@@ -95,7 +135,12 @@ class ActionResultCheck(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         global answer_iter
+        buttons = []
 
+        #append the response of API in the form of title and payload
+
+        buttons.append({"title": 'Next' , 'payload': '/start_qna'})
+        
         if answer_iter >= 4:
             print(answer_list)
             dispatcher.utter_message(text='You have got good marks')
@@ -110,22 +155,9 @@ class ActionResultCheck(Action):
             return []
 
         else:
-            dispatcher.utter_message(text='Please complete the assignment')
+            dispatcher.utter_message(text='Please complete the assignment',buttons=buttons)
             return []
-        # print(result)
-        # for i,j in result.items():
-        #     temp = 0
-        #     for question in j:
-        #             if temp==0:
-        #                 dispatcher.utter_message(text=f"""For **{i}** you have """)
-        #                 dispatcher.utter_message(text=f"""1.  **{question}** """)
-                        
-        #             else:
-        #                 dispatcher.utter_message(text=f"""1.  **{question}** """)
 
-                    
-        #             #just to check which we are on
-        #             temp+=1
 
         
 
@@ -164,17 +196,14 @@ class ActionAskAnswer1(Action):
                 # prompts can give us more than one questions per topic
                 print('J was -->',j)
                 
+
+                #then display it using dispatcher
                 if len(j)>=1:
                     j = j[:1]
                     for question in j:
-                            # if temp==0:
+
                             dispatcher.utter_message(text=f"""For **{i}** you have """)
                             dispatcher.utter_message(text=f"""1.  **{question}** """)
-                                
-                            # else:
-                            #     dispatcher.utter_message(text=f"""1.  **{question}** """)
-                            
-                            # temp+=1
                 else:
                     dispatcher.utter_message(text='Marks the end of assignment')
             return []
@@ -189,18 +218,19 @@ class ActionValidateAnswer1(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        buttons = []
+
+                #append the response of API in the form of title and payload
+
+        buttons.append({"title": 'Next' , 'payload': '/start_qna'})
         
         # update the number of answers we have answered
         print("Answer Iter  -->",answer_iter)
         if answer_iter in [0,1,2,3,4]:
             dispatcher.utter_message(text=f"We have saved your response for question {int(answer_iter)}")
-            # global answer_iter
-            # answer_iter+=1
-            
-            # dispatcher.utter_message(text=f"I have fetched your answer thanks")
 
             p = tracker.get_slot('answer_1')
-            dispatcher.utter_message(text = f'we got **{p}** ')
+            dispatcher.utter_message(text = f'we got **{p}** ',buttons=buttons)
             answer_list.append(p)
 
             return [AllSlotsReset()]
@@ -211,16 +241,3 @@ class ActionValidateAnswer1(Action):
                                      \n so you can check scoes""")
             return []
 
-    
-        # print('Answer 1 is  -->',tracker.get_slot('answer_1'))
-        # if tracker.get_slot('answer_1'):
-        #     dispatcher.utter_message(text=f"We have saved your response")
-        #     return []
-        # else:
-        #     dispatcher.utter_message(text=f"I have fetched your answer thankies")
-
-        #     p = tracker.get_slot('answer_1')
-        #     dispatcher.utter_message(text = f'we got **{p}** ')
-        #     answer_list.append(p)
-
-        #     return []
