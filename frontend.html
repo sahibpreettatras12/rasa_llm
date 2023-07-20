@@ -10,11 +10,11 @@
         (e.onload = () => {
           window.WebChat.default(
             {
-              initPayload : '/iamabot',
+              initPayload : '/welcome_onboard',
               customData: { language: "en" },
               socketUrl: "http://0.0.0.0:5005",
               title : 'HireHelp',
-              subtitle: 'Heya I am LLM Assitant'
+              subtitle: 'Heya I am Interview Assitant'
               // add other props here
             },
             null
@@ -22,6 +22,7 @@
         }),
         t.insertBefore(e, t.firstChild);
     })();
+    localStorage.clear();
     </script>
   </body>
 </html>

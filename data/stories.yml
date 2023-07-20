@@ -2,10 +2,18 @@ version: "3.1"
 
 stories:
 
+- story: onboard-happy
+  steps:
+  - intent: welcome_onboard
+  - action: action_welcome_on_board
+  - intent: result_check
+  - action: action_result_check
+
 - story: happy path
   steps:
   - intent: result_check
   - action: action_result_check
+  - action: action_listen
   - intent: mood_great
   - action: utter_happy
 
@@ -13,18 +21,13 @@ stories:
   steps:
   - intent: result_check
   - action: action_result_check
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: affirm
-  - action: utter_happy
+  - action: action_listen
+
 
 - story: sad path 2
   steps:
   - intent: result_check
   - action: action_result_check
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
+  - action: action_listen
   - intent: deny
   - action: utter_goodbye
