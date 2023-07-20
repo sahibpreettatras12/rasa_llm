@@ -7,17 +7,19 @@ rules:
   - intent: goodbye
   - action: utter_goodbye
 
-- rule: Say 'I am a bot' anytime the user challenges
-  steps:
-  - intent: bot_challenge
-  - action: utter_iamabot
 
 - rule: Activate form
   steps:
   - intent: start_qna
   - action: qna_form
   - active_loop: qna_form
-  
+
+
+- rule: welcome on board
+  steps:
+    - intent : welcome_onboard
+    - action: action_welcome_on_board
+
 - rule: Marks check
   steps:
     - intent: result_check

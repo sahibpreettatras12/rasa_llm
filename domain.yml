@@ -3,11 +3,10 @@ version: "3.1"
 intents:
   - result_check
   - goodbye
-  - affirm
   - deny
   - mood_great
-  - mood_unhappy
-  - bot_challenge
+  - welcome_onboard
+
 
 forms:
   qna_form:
@@ -26,6 +25,7 @@ actions:
   - action_result_check
   - action_ask_answer_1
   - action_validate_answer_1
+  - action_welcome_on_board
 responses:
 
   # utter_ask_answer_1: # we can also create action_ask_<slot_name> or utter_ask_<slot_name>
@@ -49,11 +49,20 @@ responses:
   utter_happy:
   - text: "Great, carry on!"
 
+  # utter_welcome_onboard:
+  # - text: "Welcome On board I am Interview Bot \n
+  #           I can help you get some Training on Topics of your RESUME \n
+  #           To get started \n
+  #           Hit on START or type in Let's start"
+  #   buttons:
+  #   - title: "START"
+  #     payload: '/start_qna'
+
   utter_goodbye:
   - text: "Bye"
 
-  utter_iamabot:
-  - text: "I am a bot, powered by Rasa."
+
+
 
 session_config:
   session_expiration_time: 60

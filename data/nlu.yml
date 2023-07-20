@@ -6,11 +6,14 @@ nlu:
   examples: |
     - ok we can start
     - ok let's start
+    - let's start
     - yup
     - i am good
     - pls 
     - proceed
     - yup we are good to go
+    - let's start
+    - Hey Interview Bot help me
 - intent: result_check
   examples: |
     - show me my result
@@ -35,14 +38,6 @@ nlu:
     - bye bye
     - see you later
 
-- intent: affirm
-  examples: |
-    - yes
-    - y
-    - indeed
-    - of course
-    - that sounds good
-    - correct
 
 - intent: deny
   examples: |
@@ -53,6 +48,15 @@ nlu:
     - don't like that
     - no way
     - not really
+
+- intent: welcome_onboard
+  examples: |
+    - Hi how can you help me
+    - how can interview bot help me
+    - i want some guidance on my resume
+    - what are you features
+    - how can this bot help me
+    - i wanna get some help with my resume how can you assist me?
 
 - intent: mood_great
   examples: |
@@ -71,26 +75,6 @@ nlu:
     - so good
     - so perfect
 
-- intent: mood_unhappy
-  examples: |
-    - my day was horrible
-    - I am sad
-    - I don't feel very well
-    - I am disappointed
-    - super sad
-    - I'm so sad
-    - sad
-    - very sad
-    - unhappy
-    - not good
-    - not very good
-    - extremly sad
-    - so saad
-    - so sad
 
-- intent: bot_challenge
-  examples: |
-    - are you a bot?
-    - are you a human?
-    - am I talking to a bot?
-    - am I talking to a human?
+
+
